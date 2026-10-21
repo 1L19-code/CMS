@@ -1,0 +1,16 @@
+{
+    "name": "ilya.cms.Editor",
+    "rootNamespace": "CMS.Editor",
+    "references": [
+        "GUID:2bacd6fb0e68f1c4fa68d0b4ed37820f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

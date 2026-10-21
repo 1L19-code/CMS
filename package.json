@@ -1,0 +1,9 @@
+﻿{
+  "name": "com.ilya.cms",
+  "version": "1.0.0",
+  "displayName": "CMS",
+  "unity": "2022.2",
+  "author": {
+    "name": "ilya"
+  }
+}

@@ -18,11 +18,14 @@ namespace CMS.Editor
 
         private readonly FileEntry[] _entries;
         private readonly IRegistrationResolver<FileExtension, Icon> _iconRegistrator;
+        private readonly IRegistrationResolver<ContextMenuAction> _contextMenuRegistrator;
 
-        public FileTree(FileEntry[] entries, IRegistrationResolver<FileExtension, Icon> iconRegistrator)
+        public FileTree(FileEntry[] entries, IRegistrationResolver<FileExtension, Icon> iconRegistrator, IRegistrationResolver<ContextMenuAction> contextMenuRegistrator)
         {
             _entries = entries;
             _iconRegistrator = iconRegistrator;
+            _contextMenuRegistrator = contextMenuRegistrator;
+            
             Show();
         }
 

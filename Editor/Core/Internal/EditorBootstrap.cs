@@ -14,7 +14,7 @@ namespace CMS.Editor
             ExtensionsBootstrap.Build(locator);
 
             var manager = new RawFileManager();
-            var fileTree = CreateFileTree(manager, locator.Get<IRegistrationResolver<FileExtension, Icon>>());
+            var fileTree = CreateFileTree(manager, locator);
 
             locator.Register(manager);
             locator.Register(fileTree);
@@ -32,12 +32,15 @@ namespace CMS.Editor
             }
         }
         
-        private static FileTree CreateFileTree(RawFileManager manager, IRegistrationResolver<FileExtension, Icon> iconResolver)
+        private static FileTree CreateFileTree(RawFileManager manager,Locator locator)
         {
-
-            var fileTree = new FileTree(manager.GetAllEntries(), iconResolver);
-            var style = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.ilya.cms/Editor/Core/Internal/FileTree/file_tree_style.uss");
+            var iconResolver = locator.Get<IRegistrationResolver<FileExtension, Icon>>();
+            var contextMenuResolver = locator.Get<IRegistrationResolver<ContextMenuAction>>();
+            
+            var fileTree = new FileTree(manager.GetAllEntries(), iconResolver, contextMenuResolver);
+            var style = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.ilya.cms/Editor/Core/FileTree/file_tree_style.uss");
             fileTree.styleSheets.Add(style);
+            
             return fileTree;
         }
     }

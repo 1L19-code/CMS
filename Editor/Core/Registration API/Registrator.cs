@@ -1,27 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CMS.Editor
 {
     public interface IRegistrator
     {
     }
+    internal interface IRegistrationResolver
+    {
+    }
+    //Collections
+    public interface IRegistrationResolver<out TInstance>
+    {
+        TInstance[] GetInstances();
+    }
+    public interface IRegistrator<in TInstance>
+    {
+        void Register(TInstance instance);
+    }
 
+    internal class Registrator<TInstance> :　IRegistrator<TInstance>, IRegistrationResolver<TInstance>
+    {
+        private readonly HashSet<TInstance> _instances = new();
+        
+        public void Register(TInstance instance)
+        {
+            _instances.Add(instance);
+        }
+        
+        public TInstance[] GetInstances()
+        {
+            return _instances.ToArray();
+        }
+    }
+
+    //Dictionaries
     public interface IRegistrator<in TKey, in TInstance> : IRegistrator
     {
         void Register(TKey key, TInstance instance);
     }
 
-    internal interface IRegistrationResolver
+    internal interface IRegistrationResolver<in TKey, out TInstance> : IRegistrationResolver
     {
-        Type KeyType { get; }
-        Type InstanceType { get; }
-    }
-
-    internal interface IRegistrationResolver<in TKey, out TInstance> :　IRegistrationResolver
-    {
-        TInstance[] GetInstances();
         TInstance GetInstanceOrDefault(TKey key);
         bool HasInstance(TKey key);
     }
@@ -36,17 +58,12 @@ namespace CMS.Editor
             _defaultInstance = defaultInstance;
         }
 
-        public Type KeyType => typeof(TKey);
-        public Type InstanceType => typeof(TInstance);
+        public GenericParameterAttributes GenericParameterAttributes
+            => typeof(Registrator<TKey, TInstance>).GenericParameterAttributes;
 
         public void Register(TKey key, TInstance instance)
         {
             _instances.Add(key, instance);
-        }
-
-        public TInstance[] GetInstances()
-        {
-            return _instances.Values.ToArray();
         }
 
         public TInstance GetInstanceOrDefault(TKey key)
@@ -59,4 +76,6 @@ namespace CMS.Editor
             return _instances.ContainsKey(key);
         }
     }
+
+
 }

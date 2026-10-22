@@ -16,25 +16,29 @@ namespace CMS.Editor
             public List<Node> Children { get; } = new();
         }
 
-        private readonly IEnumerable<FileEntry> _entries;
+        private readonly FileEntry[] _entries;
+        private readonly IRegistrationResolver<FileExtension, Icon> _iconRegistrator;
 
-        /// <summary>Icon from path resolver </summary>
-        private readonly IRegistrationResolver<Icon, string> _iconRegistrator;
-
-        public FileTree(IEnumerable<FileEntry> entries, IRegistrationResolver<Icon, string> iconRegistrator)
+        public FileTree(FileEntry[] entries, IRegistrationResolver<FileExtension, Icon> iconRegistrator)
         {
             _entries = entries;
             _iconRegistrator = iconRegistrator;
+            Show();
         }
+
+        public event Action<FileEntry> FileOpenRequested;
 
         private void Show()
         {
-            var treeView = new TreeView();
-            treeView.SetRootItems(GenerateData(_entries.ToArray()));
-
-            treeView.makeItem = () =>
+            var treeView = new TreeView
             {
+                selectionType = SelectionType.Multiple
+            };
+            treeView.SetRootItems(GenerateData(_entries));
+
+            treeView.makeItem = () => {
                 var root = new VisualElement();
+                root.AddToClassList("fileRow");
 
                 var image = new Image();
                 image.AddToClassList("icon");
@@ -48,26 +52,37 @@ namespace CMS.Editor
                 return root;
             };
 
-            treeView.bindItem = (element, index) =>
-            {
+            treeView.bindItem = (element, index) => {
                 var id = treeView.GetIdForIndex(index);
                 var file = treeView.GetItemDataForId<FileEntry>(id);
-                
-                var label =  element.Q<Label>();
+
+                var label = element.Q<Label>();
                 label.text = Path.GetFileName(file.Path);
                 
+                var fileExtension = new FileExtension(Path.GetExtension(file.Path));
                 var icon = file.IsDirectory
-                    ? EditorGUIUtility.IconContent("Directory").image
+                    ? EditorGUIUtility.IconContent("Folder Icon").image
                     : EditorGUIUtility.IconContent
                     (
-                        _iconRegistrator.GetInstance(file.Path).NameInEditorGUI
+                        _iconRegistrator.GetInstanceOrDefault(fileExtension)
+                            .NameInEditorGUI
                     ).image;
-                
+
                 var image = element.Q<Image>();
                 image.image = icon;
             };
 
+            treeView.itemsChosen += items => 
+            {
+                foreach (var obj in items)
+                {
+                    var entry = (FileEntry)obj;
+                    FileOpenRequested?.Invoke(entry);
+                }
+            };
+
             treeView.AddToClassList("fileView");
+            Add(treeView);
         }
 
         private static IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries)

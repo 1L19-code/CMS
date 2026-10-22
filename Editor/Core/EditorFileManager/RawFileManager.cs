@@ -1,11 +1,22 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace CMS.Editor
 {
-    internal class RawFileManager
+    internal class RawFileManager : IFileEntryResolver
     {
         private const string TempFileExtension = ".tmp";
+        
+        public FileEntry[] GetAllEntries()
+        {
+            var root = Path.GetFullPath(CmsConstants.PreCompilePath);
+            
+            return Directory
+                .GetFileSystemEntries(root, "*", SearchOption.AllDirectories)
+                .Select(path => new FileEntry(path, Directory.Exists(path)))
+                .ToArray();
+        }
         
         public void Save(byte[] data, string relativePath)
         {
@@ -35,5 +46,6 @@ namespace CMS.Editor
             
             return File.ReadAllBytes(path);
         }
+
     }
 }

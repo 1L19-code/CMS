@@ -1,6 +1,6 @@
 ﻿namespace CMS.Editor
 {
-    public interface IFileManager
+    internal interface IFileManager
     {
         public void Save(byte[] data, string relativePath);
         public byte[] Load(string relativePath);

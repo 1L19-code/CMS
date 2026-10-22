@@ -2,9 +2,9 @@
 
 namespace CMS.Editor
 {
-    internal readonly struct FileEntry : IEquatable<FileEntry>
+    public readonly struct FileEntry : IEquatable<FileEntry>
     {
-        public readonly string Path; 
+        public readonly string Path;
         public readonly bool IsDirectory;
 
         public FileEntry(string path, bool isDirectory)
@@ -26,6 +26,11 @@ namespace CMS.Editor
         public override int GetHashCode()
         {
             return HashCode.Combine(Path, IsDirectory);
+        }
+        
+        public override string ToString()
+        {
+            return $"path: {Path} || is directory: ({IsDirectory})";
         }
     }
 }

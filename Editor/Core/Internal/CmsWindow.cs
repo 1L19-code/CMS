@@ -36,6 +36,10 @@ namespace CMS.Editor
             _fileTree.FileOpenRequested += OnFileOpenRequested;
 
             root.Add(splitView);
+            
+            //Test
+            var fileManager = locator.Get<IFileManager>();
+            root.Add(new Button(() => fileManager.Move("test.json", "NewDir/")));
         }
 
         private void OnFileOpenRequested(FileEntry entry)

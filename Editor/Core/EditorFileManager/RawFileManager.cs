@@ -1,14 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace CMS.Editor
 {
-    internal class RawFileManager : IFileEntryResolver
+    internal static class RawFileManager
     {
         private const string TempFileExtension = ".tmp";
         
-        public FileEntry[] GetAllEntries()
+        public static FileEntry[] GetAllEntries()
         {
             var root = Path.GetFullPath(CmsConstants.PreCompilePath);
             
@@ -17,10 +18,25 @@ namespace CMS.Editor
                 .Select(path => new FileEntry(path, Directory.Exists(path)))
                 .ToArray();
         }
-        
-        public void Save(byte[] data, string relativePath)
+
+        public static FileEntry[] GetEntriesInDirectory(string directory, string searchPattern = "*")
         {
-            var path = Path.Combine(CmsConstants.PreCompilePath, relativePath);
+            directory = ValidatePath(directory);
+            
+            if(!Directory.Exists(directory))
+            {
+                throw new ArgumentException("Directory must not be null or empty", nameof(directory));
+            }
+
+            return Directory
+                .GetFileSystemEntries(directory, searchPattern, SearchOption.AllDirectories)
+                .Select(path => new FileEntry(path, Directory.Exists(path)))
+                .ToArray();
+        }
+
+        public static void Save(byte[] data, string relativePath)
+        {
+            var path = ValidatePath(relativePath);
             var directory = Path.GetDirectoryName(path);
             
             if(string.IsNullOrEmpty(directory))
@@ -37,15 +53,44 @@ namespace CMS.Editor
                 stream.Flush();
             }
             
-            File.Move(tempPath, path);
+            Move(tempPath, path);
         }
 
-        public byte[] Load(string relativePath)
+        public static byte[] Load(string relativePath)
         {
-            var path = Path.Combine(CmsConstants.PreCompilePath, relativePath);
+            var path = ValidatePath(relativePath);
             
             return File.ReadAllBytes(path);
         }
 
+        public static void Move(string sourcePath, string destPath)
+        {
+           sourcePath = ValidatePath(sourcePath);
+           destPath = ValidatePath(destPath);
+           
+            var destDirectory = Directory.Exists(destPath) ? 
+                destPath : 
+                Path.GetDirectoryName(destPath);
+
+            if (string.IsNullOrEmpty(destDirectory))
+            {
+                throw new ArgumentException("Destination directory must not be null or empty", nameof(destPath));
+            }
+            
+            var name = Path.GetFileName(sourcePath);
+            
+            File.Copy(sourcePath, Path.Combine(destDirectory, name), true);
+            File.Delete(sourcePath);
+        }
+
+        private static string ValidatePath(string path)
+        {
+            if(!path.Contains(CmsConstants.PreCompilePath))
+            {
+                path = Path.Combine(CmsConstants.PreCompilePath, path);
+            }
+            
+            return Path.GetFullPath(path);
+        }
     }
 }

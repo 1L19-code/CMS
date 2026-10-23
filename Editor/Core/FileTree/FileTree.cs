@@ -20,12 +20,13 @@ namespace CMS.Editor
         private readonly IRegistrationResolver<FileExtension, Icon> _iconRegistrator;
         private readonly IRegistrationResolver<ContextMenuAction> _contextMenuRegistrator;
 
-        public FileTree(FileEntry[] entries, IRegistrationResolver<FileExtension, Icon> iconRegistrator, IRegistrationResolver<ContextMenuAction> contextMenuRegistrator)
+        public FileTree(FileEntry[] entries, IRegistrationResolver<FileExtension, Icon> iconRegistrator,
+            IRegistrationResolver<ContextMenuAction> contextMenuRegistrator)
         {
             _entries = entries;
             _iconRegistrator = iconRegistrator;
             _contextMenuRegistrator = contextMenuRegistrator;
-            
+
             Show();
         }
 
@@ -39,7 +40,8 @@ namespace CMS.Editor
             };
             treeView.SetRootItems(GenerateData(_entries));
 
-            treeView.makeItem = () => {
+            treeView.makeItem = () =>
+            {
                 var root = new VisualElement();
                 root.AddToClassList("fileRow");
 
@@ -55,13 +57,14 @@ namespace CMS.Editor
                 return root;
             };
 
-            treeView.bindItem = (element, index) => {
+            treeView.bindItem = (element, index) =>
+            {
                 var id = treeView.GetIdForIndex(index);
                 var file = treeView.GetItemDataForId<FileEntry>(id);
 
                 var label = element.Q<Label>();
                 label.text = Path.GetFileName(file.Path);
-                
+
                 var fileExtension = new FileExtension(Path.GetExtension(file.Path));
                 var icon = file.IsDirectory
                     ? EditorGUIUtility.IconContent("Folder Icon").image
@@ -75,7 +78,7 @@ namespace CMS.Editor
                 image.image = icon;
             };
 
-            treeView.itemsChosen += items => 
+            treeView.itemsChosen += items =>
             {
                 foreach (var obj in items)
                 {
@@ -83,6 +86,8 @@ namespace CMS.Editor
                     FileOpenRequested?.Invoke(entry);
                 }
             };
+
+            CreateContextMenu(this, treeView, _contextMenuRegistrator);
 
             treeView.AddToClassList("fileView");
             Add(treeView);
@@ -145,6 +150,32 @@ namespace CMS.Editor
 
                 return new TreeViewItemData<FileEntry>(id, node.Entry, children);
             }
+        }
+
+        private static void CreateContextMenu
+            (VisualElement target, TreeView tree, IRegistrationResolver<ContextMenuAction> resolver)
+        {
+            var rootPath = Path.GetFullPath(CmsConstants.PreCompilePath);
+
+            target.AddManipulator(new ContextualMenuManipulator(evt =>
+            {
+                foreach (var contextMenuAction in resolver.GetInstances())
+                {
+                    evt.menu.AppendAction
+                    (
+                        contextMenuAction.Path,
+                        _ =>
+                        {
+                            var file = tree.selectedItem is not null
+                                ? (FileEntry)tree.selectedItem
+                                : new FileEntry(rootPath, isDirectory: true);
+
+                            contextMenuAction.Action.Invoke(file);
+                        },
+                        DropdownMenuAction.AlwaysEnabled
+                    );
+                }
+            }));
         }
     }
 }

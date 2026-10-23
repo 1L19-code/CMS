@@ -15,7 +15,7 @@ namespace CMS.Editor
             foreach (var registrator in registrators)
             foreach (var installer in installers)
             {
-                installer.TryInstall(registrator);
+                installer.TryInstall(locator, registrator);
             }
         }
     }

@@ -5,14 +5,11 @@ using System.Reflection;
 
 namespace CMS.Editor
 {
-    public interface IRegistrator
-    {
-    }
     internal interface IRegistrationResolver
     {
     }
     //Collections
-    public interface IRegistrationResolver<out TInstance>
+    internal interface IRegistrationResolver<out TInstance> : IRegistrationResolver
     {
         TInstance[] GetInstances();
     }
@@ -37,7 +34,7 @@ namespace CMS.Editor
     }
 
     //Dictionaries
-    public interface IRegistrator<in TKey, in TInstance> : IRegistrator
+    public interface IRegistrator<in TKey, in TInstance>
     {
         void Register(TKey key, TInstance instance);
     }

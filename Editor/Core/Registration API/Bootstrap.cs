@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Cms.Build;
 using ilya.cms.Editor;
 
 namespace CMS.Editor
@@ -8,7 +9,6 @@ namespace CMS.Editor
     {
         public static void Build(Locator locator)
         {
-            ExtensionsBootstrapUtility.BindRegistratorsInLocator(locator);
             var registrators = locator.GetSubclassOf<IRegistrationResolver>();
             var installers = ExtensionsBootstrapUtility.GetInstallers();
 
@@ -39,14 +39,18 @@ namespace CMS.Editor
             var icon = new Registrator<FileExtension, Icon>(new Icon("d_DefaultAsset Icon"));
             var inspector = new Registrator<FileExtension, IInspectorWindow>(new FileDoesNotSupportInspector());
             var contextMenu = new Registrator<ContextMenuAction>();
-            var visibilityIgnoreExtension = new Registrator<FileExtension>();
+            var customMetadataRegistrator = new Registrator<FileExtension>();
             var visibilityIgnoreFile = new Registrator<FileEntry>();
+            var customCompiler = new Registrator<ICustomContentCompiler>();
+            var metadataGenerators = new Registrator<IMetadataGenerator>();
             
             locator.Register(icon);
             locator.Register(inspector);
             locator.Register(contextMenu);
-            locator.Register(visibilityIgnoreExtension);
+            locator.Register(customMetadataRegistrator);
             locator.Register(visibilityIgnoreFile);
+            locator.Register(customCompiler);
+            locator.Register(metadataGenerators);
         }
     }
 }

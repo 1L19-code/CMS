@@ -31,7 +31,7 @@ namespace CMS.Editor
 
         private readonly IRegistrationResolver<FileExtension, Icon> _iconRegistrator;
         private readonly IRegistrationResolver<ContextMenuAction> _contextMenuRegistrator;
-        private readonly IRegistrationResolver<FileExtension> _visibilityIgnoreRegistrator;
+        private readonly IRegistrationResolver<FileExtension> _customMetadataResolver;
         private readonly IRootDirectoryChangeObserver _changeObserver;
         private readonly HashSet<int> _directoryIndexes = new();
 
@@ -39,13 +39,13 @@ namespace CMS.Editor
 
         public FileTree(IRegistrationResolver<FileExtension, Icon> iconRegistrator,
             IRegistrationResolver<ContextMenuAction> contextMenuRegistrator,
-            IRegistrationResolver<FileExtension> visibilityIgnoreRegistrator,
+            IRegistrationResolver<FileExtension> customMetadataResolver,
             IRootDirectoryChangeObserver changeObserver)
         {
             _iconRegistrator = iconRegistrator;
             _contextMenuRegistrator = contextMenuRegistrator;
             _changeObserver = changeObserver;
-            _visibilityIgnoreRegistrator = visibilityIgnoreRegistrator;
+            _customMetadataResolver = customMetadataResolver;
 
             _changeObserver.Changed += Refresh;
 
@@ -64,7 +64,7 @@ namespace CMS.Editor
         {
             var expandedIds = GetExpandedIds(_treeView, _directoryIndexes.ToArray());
             _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries(),
-                _visibilityIgnoreRegistrator.GetInstances()));
+                _customMetadataResolver.GetInstances()));
             _treeView.Rebuild();
 
             foreach (var expandedId in expandedIds)
@@ -85,7 +85,7 @@ namespace CMS.Editor
                 reorderable = true,
             };
             _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries(),
-                _visibilityIgnoreRegistrator.GetInstances()));
+                _customMetadataResolver.GetInstances()));
 
             _treeView.makeItem = () =>
             {
@@ -158,11 +158,11 @@ namespace CMS.Editor
         }
 
         private static IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries,
-            FileExtension[] ignoredExtensions)
+            FileExtension[] customMetadataExtensions)
         {
-            var ignoreHash = ignoredExtensions.ToHashSet();
+            var customMetadataExtensionsHash = customMetadataExtensions.ToHashSet();
             var paths = entries
-                .Where(entry => !ignoreHash.Contains(FileExtension.FromPath(entry.Path)))
+                .Where(entry => !customMetadataExtensionsHash.Contains(FileExtension.FromPath(entry.Path)))
                 .ToDictionary
                 (
                     e => e.Path,

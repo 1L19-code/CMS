@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using UnityEditor;
+using Cms.Build;
+using ilya.cms.Editor;
 using UnityEngine.UIElements;
 
 namespace CMS.Editor
@@ -8,19 +10,49 @@ namespace CMS.Editor
     {
         public static Locator Initialize()
         {
+            var locator = InitializeServices();
+
+            var fileTree = CreateFileTree(locator);
+            locator.Register(fileTree);
+
+            return locator;
+        }
+
+        internal static Locator InitializeServices()
+        {
             ValidateRoot();
 
             var locator = new Locator();
-            ExtensionsBootstrap.Build(locator);
+            ExtensionsBootstrapUtility.BindRegistratorsInLocator(locator);
 
-            locator.Get<IRegistrator<FileExtension>>()
-                .Register(new FileExtension(CmsConstants.MetaFileExtension));
+            var customMetadataRegistrator = locator.Get<IRegistrator<FileExtension>>();
+            customMetadataRegistrator.Register(new FileExtension(CmsConstants.MetaFileExtension));
+            customMetadataRegistrator.Register(new FileExtension(CmsConstants.ReaderIdFileExtension));
+            customMetadataRegistrator.Register(new FileExtension("meta"));
 
             var fileManager = new ContentFileManager();
             locator.Register(fileManager);
 
-            var fileTree = CreateFileTree(locator);
-            locator.Register(fileTree);
+            var readerIdService = new ReaderIdService(
+                locator.Get<IRegistrationResolver<FileExtension, IInspectorWindow>>(),
+                locator.Get<IRegistrationResolver<FileExtension>>());
+            locator.Register(readerIdService);
+
+            var contentIdService = new ContentIdService(locator.Get<IRegistrationResolver<FileExtension>>());
+            locator.Register(contentIdService);
+
+            var metadataGenerators = locator.Get<IRegistrator<IMetadataGenerator>>();
+            metadataGenerators.Register(contentIdService);
+            metadataGenerators.Register(readerIdService);
+
+            ExtensionsBootstrap.Build(locator);
+
+            var metadataPipeline = new MetadataGenerationPipeline(
+                locator.Get<IRegistrationResolver<IMetadataGenerator>>(),
+                locator.Get<IRegistrationResolver<FileExtension>>(),
+                customMetadataRegistrator,
+                locator.Get<IRootDirectoryChangeObserver>());
+            locator.Register(metadataPipeline);
 
             return locator;
         }
@@ -39,10 +71,10 @@ namespace CMS.Editor
         {
             var iconResolver = locator.Get<IRegistrationResolver<FileExtension, Icon>>();
             var contextMenuResolver = locator.Get<IRegistrationResolver<ContextMenuAction>>();
-            var ignoreResolver = locator.Get<IRegistrationResolver<FileExtension>>();
+            var customMetadataResolver = locator.Get<IRegistrationResolver<FileExtension>>();
             var observer = locator.Get<IRootDirectoryChangeObserver>();
 
-            var fileTree = new FileTree(iconResolver, contextMenuResolver, ignoreResolver, observer);
+            var fileTree = new FileTree(iconResolver, contextMenuResolver, customMetadataResolver, observer);
             var style = AssetDatabase.LoadAssetAtPath<StyleSheet>(
                 "Packages/com.ilya.cms/Editor/Core/FileTree/file_tree_style.uss");
             fileTree.styleSheets.Add(style);

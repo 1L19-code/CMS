@@ -13,6 +13,7 @@ namespace CMS.Editor
         private VisualElement _inspectorWrapper;
         private FileTree _fileTree;
         private IFileManager _fileManager;
+        private MetadataGenerationPipeline _metadataGenerationPipeline;
         private IRegistrationResolver<FileExtension, IInspectorWindow> _inspectorWindowResolver;
 
         [MenuItem("CMS/Window")]
@@ -28,6 +29,7 @@ namespace CMS.Editor
             var root = rootVisualElement;
             var locator = EditorBootstrap.Initialize();
 
+            _metadataGenerationPipeline = locator.Get<MetadataGenerationPipeline>();
             _fileTree = locator.Get<FileTree>();
             _fileManager = locator.Get<IFileManager>();
             _inspectorWindowResolver = locator.Get<IRegistrationResolver<FileExtension, IInspectorWindow>>();
@@ -43,8 +45,14 @@ namespace CMS.Editor
 
         private void OnDisable()
         {
-            _fileTree.FileOpenRequested -= OnFileOpenRequested;
-            _fileTree.FileMoveRequested -= OnFileMoveRequested;
+            if (_fileTree != null)
+            {
+                _fileTree.FileOpenRequested -= OnFileOpenRequested;
+                _fileTree.FileMoveRequested -= OnFileMoveRequested;
+                _fileTree.Dispose();
+            }
+
+            _metadataGenerationPipeline?.Dispose();
         }
 
         private void OnFileOpenRequested(FileEntry entry)

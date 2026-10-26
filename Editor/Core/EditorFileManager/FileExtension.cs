@@ -9,12 +9,12 @@ namespace CMS.Editor
         
         public FileExtension(string value)
         {
-            Value = value;
+            Value = value?.TrimStart('.').ToLowerInvariant();
         }
 
         public static FileExtension FromPath(string path)
         {
-            return new FileExtension(Path.GetFileName(path).Split('.')[^1]);
+            return new FileExtension(Path.GetExtension(path));
         }
         public bool Equals(FileExtension other)
         {

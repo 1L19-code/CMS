@@ -45,7 +45,7 @@ namespace CMS.Editor
             if(!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
             
-            var tempPath = Path.Combine(path, TempFileExtension);
+            var tempPath = path + TempFileExtension;
             
             using (var stream = new FileStream(tempPath, FileMode.Create))
             {
@@ -53,7 +53,8 @@ namespace CMS.Editor
                 stream.Flush();
             }
             
-            Move(tempPath, path);
+            File.Copy(tempPath, path, true);
+            File.Delete(tempPath);
         }
 
         public static byte[] Load(string relativePath)

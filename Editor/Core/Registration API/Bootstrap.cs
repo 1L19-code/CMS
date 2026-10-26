@@ -39,10 +39,14 @@ namespace CMS.Editor
             var icon = new Registrator<FileExtension, Icon>(new Icon("d_DefaultAsset Icon"));
             var inspector = new Registrator<FileExtension, IInspectorWindow>(new FileDoesNotSupportInspector());
             var contextMenu = new Registrator<ContextMenuAction>();
+            var visibilityIgnoreExtension = new Registrator<FileExtension>();
+            var visibilityIgnoreFile = new Registrator<FileEntry>();
             
             locator.Register(icon);
             locator.Register(inspector);
             locator.Register(contextMenu);
+            locator.Register(visibilityIgnoreExtension);
+            locator.Register(visibilityIgnoreFile);
         }
     }
 }

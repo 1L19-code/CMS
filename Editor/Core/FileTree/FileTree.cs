@@ -31,6 +31,7 @@ namespace CMS.Editor
 
         private readonly IRegistrationResolver<FileExtension, Icon> _iconRegistrator;
         private readonly IRegistrationResolver<ContextMenuAction> _contextMenuRegistrator;
+        private readonly IRegistrationResolver<FileExtension> _visibilityIgnoreRegistrator;
         private readonly IRootDirectoryChangeObserver _changeObserver;
         private readonly HashSet<int> _directoryIndexes = new();
 
@@ -38,11 +39,13 @@ namespace CMS.Editor
 
         public FileTree(IRegistrationResolver<FileExtension, Icon> iconRegistrator,
             IRegistrationResolver<ContextMenuAction> contextMenuRegistrator,
+            IRegistrationResolver<FileExtension> visibilityIgnoreRegistrator,
             IRootDirectoryChangeObserver changeObserver)
         {
             _iconRegistrator = iconRegistrator;
             _contextMenuRegistrator = contextMenuRegistrator;
             _changeObserver = changeObserver;
+            _visibilityIgnoreRegistrator = visibilityIgnoreRegistrator;
 
             _changeObserver.Changed += Refresh;
 
@@ -60,7 +63,8 @@ namespace CMS.Editor
         public void Refresh()
         {
             var expandedIds = GetExpandedIds(_treeView, _directoryIndexes.ToArray());
-            _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries()));
+            _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries(),
+                _visibilityIgnoreRegistrator.GetInstances()));
             _treeView.Rebuild();
 
             foreach (var expandedId in expandedIds)
@@ -80,7 +84,8 @@ namespace CMS.Editor
                 selectionType = SelectionType.Multiple,
                 reorderable = true,
             };
-            _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries()));
+            _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries(),
+                _visibilityIgnoreRegistrator.GetInstances()));
 
             _treeView.makeItem = () =>
             {
@@ -152,13 +157,17 @@ namespace CMS.Editor
             Add(_treeView);
         }
 
-        private static IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries)
+        private static IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries,
+            FileExtension[] ignoredExtensions)
         {
-            var paths = entries.ToDictionary
-            (
-                e => e.Path,
-                e => new Node { Entry = e }
-            );
+            var ignoreHash = ignoredExtensions.ToHashSet();
+            var paths = entries
+                .Where(entry => !ignoreHash.Contains(FileExtension.FromPath(entry.Path)))
+                .ToDictionary
+                (
+                    e => e.Path,
+                    e => new Node { Entry = e }
+                );
 
             var rootPath = Path.GetFullPath(CmsConstants.PreCompilePath);
             var root = new Node

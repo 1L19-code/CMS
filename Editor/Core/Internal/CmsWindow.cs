@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using ilya.cms.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace CMS.Editor
 
         private VisualElement _inspectorWrapper;
         private FileTree _fileTree;
+        private IFileManager _fileManager;
         private IRegistrationResolver<FileExtension, IInspectorWindow> _inspectorWindowResolver;
 
         [MenuItem("CMS/Window")]
@@ -27,6 +29,7 @@ namespace CMS.Editor
             var locator = EditorBootstrap.Initialize();
 
             _fileTree = locator.Get<FileTree>();
+            _fileManager = locator.Get<IFileManager>();
             _inspectorWindowResolver = locator.Get<IRegistrationResolver<FileExtension, IInspectorWindow>>();
             _inspectorWrapper = new VisualElement();
             var splitView = new TwoPaneSplitView();
@@ -34,12 +37,14 @@ namespace CMS.Editor
             splitView.Add(_inspectorWrapper);
 
             _fileTree.FileOpenRequested += OnFileOpenRequested;
-
+            _fileTree.FileMoveRequested += OnFileMoveRequested;
             root.Add(splitView);
-            
-            //Test
-            var fileManager = locator.Get<IFileManager>();
-            root.Add(new Button(() => fileManager.Move("test.json", "NewDir/")));
+        }
+
+        private void OnDisable()
+        {
+            _fileTree.FileOpenRequested -= OnFileOpenRequested;
+            _fileTree.FileMoveRequested -= OnFileMoveRequested;
         }
 
         private void OnFileOpenRequested(FileEntry entry)
@@ -48,6 +53,11 @@ namespace CMS.Editor
             var window = _inspectorWindowResolver.GetInstanceOrDefault(extension);
             _inspectorWrapper.Clear();
             _inspectorWrapper.Add(window.GetWindow(entry));
+        }
+        
+        private void OnFileMoveRequested(FileMoveRequest request)
+        {
+            _fileManager.Move(request.File.Path, request.NewPath);
         }
     }
 }

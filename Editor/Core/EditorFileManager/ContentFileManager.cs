@@ -1,15 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
-using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
-using UnityEngine;
 
 namespace CMS.Editor
 {
-    public class ContentFileManager : IFileManager
+    public class ContentFileManager : IFileManager, IRootDirectoryChangeObserver
     {
+        public event Action Changed;
+        
         public void Save(byte[] data, string relativePath)
         {
             RawFileManager.Save(data, relativePath);
+            Changed?.Invoke();
         }
 
         public byte[] Load(string relativePath)
@@ -26,7 +28,7 @@ namespace CMS.Editor
                 throw new System.ArgumentNullException(relativePath);
             }
 
-            var meta = GetAllMetaFilePaths(path);
+            var meta = GetAllMetaFilesPaths(path);
 
             File.Delete(path);
 
@@ -34,11 +36,13 @@ namespace CMS.Editor
             {
                 File.Delete(metaEntry);
             }
+            
+            Changed?.Invoke();
         }
 
         public void Move(string sourcePath, string destPath)
         {
-            var allMetaFilePaths = GetAllMetaFilePaths(sourcePath);
+            var allMetaFilePaths = GetAllMetaFilesPaths(sourcePath);
             
             RawFileManager.Move(sourcePath, destPath);
 
@@ -50,6 +54,8 @@ namespace CMS.Editor
                 
                 RawFileManager.Move(meta, destinationDirectory);
             }
+            
+            Changed?.Invoke();
         }
 
         public void Save(byte[] data, FileEntry entry)
@@ -67,7 +73,7 @@ namespace CMS.Editor
             Delete(entry.Path);
         }
 
-        private static string[] GetAllMetaFilePaths(string filePath)
+        private static string[] GetAllMetaFilesPaths(string filePath)
         {
             var name = Path.GetFileName(filePath);
             var nameWithoutExtensions = name.Split('.').First();
@@ -82,5 +88,6 @@ namespace CMS.Editor
                 .Select(entry => entry.Path)
                 .ToArray();
         }
+
     }
 }

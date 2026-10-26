@@ -3,12 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 using TreeView = UnityEngine.UIElements.TreeView;
 
 namespace CMS.Editor
 {
-    internal class FileTree : VisualElement
+    internal readonly struct FileMoveRequest
+    {
+        public readonly FileEntry File;
+        public readonly string NewPath;
+
+        public FileMoveRequest(FileEntry file, string newPath)
+        {
+            File = file;
+            NewPath = newPath;
+        }
+    }
+
+    internal class FileTree : VisualElement, IDisposable
     {
         private class Node
         {
@@ -16,31 +29,60 @@ namespace CMS.Editor
             public List<Node> Children { get; } = new();
         }
 
-        private readonly FileEntry[] _entries;
         private readonly IRegistrationResolver<FileExtension, Icon> _iconRegistrator;
         private readonly IRegistrationResolver<ContextMenuAction> _contextMenuRegistrator;
+        private readonly IRootDirectoryChangeObserver _changeObserver;
+        private readonly HashSet<int> _directoryIndexes = new();
 
-        public FileTree(FileEntry[] entries, IRegistrationResolver<FileExtension, Icon> iconRegistrator,
-            IRegistrationResolver<ContextMenuAction> contextMenuRegistrator)
+        private TreeView _treeView;
+
+        public FileTree(IRegistrationResolver<FileExtension, Icon> iconRegistrator,
+            IRegistrationResolver<ContextMenuAction> contextMenuRegistrator,
+            IRootDirectoryChangeObserver changeObserver)
         {
-            _entries = entries;
             _iconRegistrator = iconRegistrator;
             _contextMenuRegistrator = contextMenuRegistrator;
+            _changeObserver = changeObserver;
+
+            _changeObserver.Changed += Refresh;
 
             Show();
         }
 
         public event Action<FileEntry> FileOpenRequested;
+        public event Action<FileMoveRequest> FileMoveRequested;
+
+        public void Dispose()
+        {
+            _changeObserver.Changed -= Refresh;
+        }
+
+        public void Refresh()
+        {
+            var expandedIds = GetExpandedIds(_treeView, _directoryIndexes.ToArray());
+            _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries()));
+            _treeView.Rebuild();
+
+            foreach (var expandedId in expandedIds)
+            {
+                Debug.Log(expandedId);
+                _treeView.ExpandItem(expandedId);
+            }
+
+            _directoryIndexes.Clear();
+        }
 
         private void Show()
         {
-            var treeView = new TreeView
+            _directoryIndexes.Clear();
+            _treeView = new TreeView
             {
-                selectionType = SelectionType.Multiple
+                selectionType = SelectionType.Multiple,
+                reorderable = true,
             };
-            treeView.SetRootItems(GenerateData(_entries));
+            _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries()));
 
-            treeView.makeItem = () =>
+            _treeView.makeItem = () =>
             {
                 var root = new VisualElement();
                 root.AddToClassList("fileRow");
@@ -57,10 +99,10 @@ namespace CMS.Editor
                 return root;
             };
 
-            treeView.bindItem = (element, index) =>
+            _treeView.bindItem = (element, index) =>
             {
-                var id = treeView.GetIdForIndex(index);
-                var file = treeView.GetItemDataForId<FileEntry>(id);
+                var id = _treeView.GetIdForIndex(index);
+                var file = _treeView.GetItemDataForId<FileEntry>(id);
 
                 var label = element.Q<Label>();
                 label.text = Path.GetFileName(file.Path);
@@ -76,9 +118,14 @@ namespace CMS.Editor
 
                 var image = element.Q<Image>();
                 image.image = icon;
+
+                if (file.IsDirectory)
+                {
+                    _directoryIndexes.Add(index);
+                }
             };
 
-            treeView.itemsChosen += items =>
+            _treeView.itemsChosen += items =>
             {
                 foreach (var obj in items)
                 {
@@ -87,10 +134,22 @@ namespace CMS.Editor
                 }
             };
 
-            CreateContextMenu(this, treeView, _contextMenuRegistrator);
+            _treeView.itemIndexChanged += (itemId, destinationId) =>
+            {
+                var destinationEntry = _treeView.GetItemDataForId<FileEntry>(destinationId);
 
-            treeView.AddToClassList("fileView");
-            Add(treeView);
+                var directoryEntry = destinationEntry.IsDirectory
+                    ? destinationEntry
+                    : _treeView.GetItemDataForId<FileEntry>(_treeView.GetParentIdForIndex(destinationId));
+
+                var fileEntry = _treeView.GetItemDataForId<FileEntry>(itemId);
+                FileMoveRequested?.Invoke(new FileMoveRequest(fileEntry, directoryEntry.Path));
+            };
+
+            CreateContextMenu(this, _treeView, _contextMenuRegistrator, Refresh);
+
+            _treeView.AddToClassList("fileView");
+            Add(_treeView);
         }
 
         private static IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries)
@@ -153,7 +212,8 @@ namespace CMS.Editor
         }
 
         private static void CreateContextMenu
-            (VisualElement target, TreeView tree, IRegistrationResolver<ContextMenuAction> resolver)
+        (VisualElement target, TreeView tree, IRegistrationResolver<ContextMenuAction> resolver,
+            Action refreshAction)
         {
             var rootPath = Path.GetFullPath(CmsConstants.PreCompilePath);
 
@@ -175,7 +235,14 @@ namespace CMS.Editor
                         DropdownMenuAction.AlwaysEnabled
                     );
                 }
+
+                evt.menu.AppendAction("Refresh", _ => refreshAction?.Invoke());
             }));
+        }
+
+        private static int[] GetExpandedIds(TreeView view, IReadOnlyList<int> indexes)
+        {
+            return indexes.Select(view.GetIdForIndex).Where(view.IsExpanded).ToArray();
         }
     }
 }

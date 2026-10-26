@@ -65,8 +65,8 @@ namespace CMS.Editor
 
         public static void Move(string sourcePath, string destPath)
         {
-           sourcePath = ValidatePath(sourcePath);
-           destPath = ValidatePath(destPath);
+            sourcePath = ValidatePath(sourcePath);
+            destPath = ValidatePath(destPath);
            
             var destDirectory = Directory.Exists(destPath) ? 
                 destPath : 

@@ -12,5 +12,6 @@ namespace CMS.Editor
             Path = path;
             Action = action;
         }
+
     }
 }

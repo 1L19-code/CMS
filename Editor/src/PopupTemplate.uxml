@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.ilya.cms/Editor/src/PopupTemplateStyle.uss?fileID=7433441132597879392&amp;guid=d1800cd6213f98f4aac4b6e1bcffdbee&amp;type=3#PopupTemplateStyle"/>
+    <ui:VisualElement name="Body" class="Body" style="flex-grow: 1;">
+        <ui:Label text="Label" name="Title" class="Title"/>
+        <ui:VisualElement name="TextFieldWrapper">
+            <ui:TextField label="Text Field" placeholder-text="" name="" style="-unity-background-image-tint-color: rgb(32, 32, 32); background-color: rgba(19, 19, 19, 0);"/>
+            <ui:Label text="Label" class="Suffix"/>
+        </ui:VisualElement>
+        <ui:Button text="Button"/>
+    </ui:VisualElement>
+</ui:UXML>

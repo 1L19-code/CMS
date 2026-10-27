@@ -28,7 +28,7 @@ namespace CMS.Editor
         {
             var root = rootVisualElement;
             var locator = EditorBootstrap.Initialize();
-
+            
             _metadataGenerationPipeline = locator.Get<MetadataGenerationPipeline>();
             _fileTree = locator.Get<FileTree>();
             _fileManager = locator.Get<IFileManager>();
@@ -41,6 +41,7 @@ namespace CMS.Editor
             _fileTree.FileOpenRequested += OnFileOpenRequested;
             _fileTree.FileMoveRequested += OnFileMoveRequested;
             root.Add(splitView);
+            root.Add(locator.Get<PopupsWrapper>());
         }
 
         private void OnDisable()

@@ -1,0 +1,36 @@
+:root {
+}
+
+#Body{
+    background-color: #363636;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 16px;
+    padding: 16px;
+}
+
+.Title{
+    font-size: 24px;
+}
+
+#TextFieldWrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+}
+
+TextField>#unity-text-input{
+    background-color: #4f4f4f;
+    border-radius: 10px;
+}
+
+.Suffix{
+    font-size: 12px;
+}
+
+Button{
+    background-color: #4f4f4f;
+    border-radius: 10px;
+    color: #ffffff;
+}

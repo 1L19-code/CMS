@@ -2,7 +2,8 @@
     "name": "ilya.cms.Editor",
     "rootNamespace": "CMS.Editor",
     "references": [
-        "GUID:2bacd6fb0e68f1c4fa68d0b4ed37820f"
+        "GUID:2bacd6fb0e68f1c4fa68d0b4ed37820f",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -52,6 +52,27 @@ namespace CMS.Editor
                 locator.Get<IRootDirectoryChangeObserver>());
             locator.Register(metadataPipeline);
 
+            locator.Register(new PopupsWrapper());
+
+            var popupsWrapper = locator.Get<PopupsWrapper>();
+
+            locator.Get<IRegistrator<ContextMenuAction>>()
+                .Register(new ContextMenuAction("Delete", entry =>
+                {
+                    popupsWrapper.ShowPopup(PopupDefinition
+                        .WithTitle("Delete?")
+                        .WithButtons(
+                            new ButtonDefinition("Delete", _ =>
+                            {
+                                if (entry.Path == Path.GetFullPath(CmsConstants.PreCompilePath))
+                                {
+                                    return;
+                                }
+
+                                fileManager.Delete(entry);
+                            })));
+                }));
+
             return locator;
         }
 

@@ -21,20 +21,27 @@ namespace CMS.Editor
 
         public void Delete(string relativePath)
         {
-            var path = Path.GetDirectoryName(relativePath);
+            var path = Path.GetFullPath(relativePath);
 
             if (string.IsNullOrEmpty(path))
             {
                 throw new System.ArgumentNullException(relativePath);
             }
 
-            var meta = GetAllMetaFilesPaths(path);
-
-            File.Delete(path);
-
-            foreach (var metaEntry in meta)
+            if (Directory.Exists(path))
             {
-                File.Delete(metaEntry);
+                Directory.Delete(path, recursive: true);
+            }
+            else
+            {
+                var meta = GetAllMetaFilesPaths(path);
+
+                File.Delete(path);
+
+                foreach (var metaEntry in meta)
+                {
+                    File.Delete(metaEntry);
+                }
             }
             
             Changed?.Invoke();

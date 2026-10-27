@@ -73,6 +73,4 @@ namespace CMS.Editor
             return _instances.ContainsKey(key);
         }
     }
-
-
 }

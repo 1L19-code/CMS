@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CMS;
-using CMS.Editor;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     internal class UnregisteredFileCompiler
     {
         private readonly string _rootPath;
 
-        private readonly IContentIdResolver _contentService;
+        private readonly IMetadataResolver<ContentId> _contentService;
         private readonly IReaderIdService _readerIdService;
         private readonly IRegistrationResolver<FileExtension> _customMetadataResolver;
 
-        public UnregisteredFileCompiler(string rootPath, IContentIdResolver contentService,
+        public UnregisteredFileCompiler(string rootPath, IMetadataResolver<ContentId> contentService,
             IReaderIdService readerIdService, IRegistrationResolver<FileExtension> customMetadataResolver)
         {
             _rootPath = rootPath;
@@ -80,7 +78,7 @@ namespace Cms.Build
                 if (!_readerIdService.TryGetId(entry.Path, out var readerId))
                     continue;
 
-                var id = _contentService.GetContentId(entry.Path);
+                var id = _contentService.Resolve(entry.Path);
                 var data = RawFileManager.Load(entry.Path);
                 segments.Add(new Segment(id, readerId, data));
             }

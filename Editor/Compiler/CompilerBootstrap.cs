@@ -1,12 +1,10 @@
 #if UNITY_EDITOR
-using CMS;
-using CMS.Editor;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     public static class CompilerEditorCommand
     {
@@ -33,7 +31,7 @@ namespace Cms.Build
 
             var unregisteredFileCompiler = new UnregisteredFileCompiler(
                 CmsConstants.CompileRoot,
-                locator.Get<IContentIdResolver>(),
+                locator.Get<IMetadataResolver<ContentId>>(),
                 locator.Get<IReaderIdService>(),
                 locator.Get<IRegistrationResolver<FileExtension>>());
 

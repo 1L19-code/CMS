@@ -3,12 +3,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CMS;
-using CMS.Editor;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
-    internal sealed class ContentIdService : IContentIdResolver, IMetadataGenerator
+    internal sealed class ContentIdService : IMetadataResolver<ContentId>, IMetadataGenerator
     {
         private readonly IRegistrationResolver<FileExtension> _customMetadataResolver;
 
@@ -18,9 +16,14 @@ namespace Cms.Build
         }
 
         public int Order => 0;
-        public FileExtension MetadataExtension => new(CmsConstants.MetaFileExtension);
+        public FileExtension MetadataExtension => new(CmsConstants.ContentIdFileExtension);
 
-        public ContentId GetContentId(string path)
+        public ContentId Resolve(FileEntry entry)
+        {
+            return Resolve(entry.Path);
+        }
+
+        public ContentId Resolve(string path)
         {
             if (_customMetadataResolver.GetInstances().Contains(FileExtension.FromPath(path)))
                 throw new ArgumentException("Metadata files do not have a content ID", nameof(path));

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     public static class ContainerFileConstants
     {

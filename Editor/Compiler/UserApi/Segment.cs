@@ -1,8 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
-using CMS;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     public readonly struct Segment : IEquatable<Segment>
     {

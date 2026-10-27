@@ -1,9 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
-using CMS.Editor;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     internal class ContentCompilePipeline : IContentCompilePipeline
     {

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using UnityEditor;
-using Cms.Build;
 using ilya.cms.Editor;
 using UnityEngine.UIElements;
 
@@ -26,9 +25,8 @@ namespace CMS.Editor
             ExtensionsBootstrapUtility.BindRegistratorsInLocator(locator);
 
             var customMetadataRegistrator = locator.Get<IRegistrator<FileExtension>>();
-            customMetadataRegistrator.Register(new FileExtension(CmsConstants.MetaFileExtension));
+            customMetadataRegistrator.Register(new FileExtension(CmsConstants.ContentIdFileExtension));
             customMetadataRegistrator.Register(new FileExtension(CmsConstants.ReaderIdFileExtension));
-            customMetadataRegistrator.Register(new FileExtension("meta"));
 
             var fileManager = new ContentFileManager();
             locator.Register(fileManager);

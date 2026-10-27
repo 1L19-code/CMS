@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Cms.Build;
 using ilya.cms.Editor;
 
 namespace CMS.Editor

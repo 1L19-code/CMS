@@ -2,11 +2,9 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using CMS;
-using CMS.Editor;
 using ilya.cms.Editor;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     internal sealed class ReaderIdService : IReaderIdService, IMetadataGenerator
     {

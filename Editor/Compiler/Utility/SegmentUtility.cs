@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     internal static class SegmentUtility
     {

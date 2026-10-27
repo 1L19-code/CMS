@@ -69,7 +69,6 @@ namespace CMS.Editor
 
             foreach (var expandedId in expandedIds)
             {
-                Debug.Log(expandedId);
                 _treeView.ExpandItem(expandedId);
             }
 

@@ -1,8 +1,7 @@
 ﻿using System.IO;
-using CMS;
 using UnityEngine;
 
-namespace Cms.Build
+namespace CMS.Editor
 {
     public interface IContainerFileReader
     {

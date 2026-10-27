@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-namespace Cms.Build
+namespace CMS.Editor
 {
     public interface IContentCompilePipeline
     {

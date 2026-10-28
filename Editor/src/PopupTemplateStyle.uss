@@ -3,6 +3,8 @@
 
 #Body{
     background-color: #363636;
+    border-width: 1px;
+    border-color: #595858;
     border-radius: 10px;
     color: #ffffff;
     font-size: 16px;
@@ -20,9 +22,10 @@
     height: 40px;
 }
 
-TextField>#unity-text-input{
+TextField>TextInput{
     background-color: #4f4f4f;
     border-radius: 10px;
+    min-width: 70px;
 }
 
 .Suffix{

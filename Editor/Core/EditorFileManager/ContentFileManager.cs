@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace CMS.Editor
 {
     public class ContentFileManager : IFileManager, IRootDirectoryChangeObserver
     {
         public event Action Changed;
-        
+
         public void Save(byte[] data, string relativePath)
         {
             RawFileManager.Save(data, relativePath);
@@ -17,6 +18,11 @@ namespace CMS.Editor
         public byte[] Load(string relativePath)
         {
             return RawFileManager.Load(relativePath);
+        }
+
+        public string LoadUtf8(string relativePath)
+        {
+            return Encoding.UTF8.GetString(Load(relativePath));
         }
 
         public void Delete(string relativePath)
@@ -43,24 +49,33 @@ namespace CMS.Editor
                     File.Delete(metaEntry);
                 }
             }
-            
+
             Changed?.Invoke();
         }
 
         public void Move(string sourcePath, string destPath)
         {
             var allMetaFilePaths = GetAllMetaFilesPaths(sourcePath);
-            
+
             RawFileManager.Move(sourcePath, destPath);
 
             foreach (var meta in allMetaFilePaths)
             {
-                var destinationDirectory = Directory.Exists(destPath) ? 
-                    destPath : 
-                    Path.GetDirectoryName(destPath);
-                
+                var destinationDirectory = Directory.Exists(destPath) ? destPath : Path.GetDirectoryName(destPath);
+
                 RawFileManager.Move(meta, destinationDirectory);
             }
+
+            Changed?.Invoke();
+        }
+
+        public void CreateDirectory(string relativePath)
+        {
+            if (Directory.Exists(relativePath)) 
+                return;
+
+            var path = Path.GetFullPath(relativePath);
+            Directory.CreateDirectory(path);
             
             Changed?.Invoke();
         }
@@ -73,6 +88,11 @@ namespace CMS.Editor
         public byte[] Load(FileEntry entry)
         {
             return Load(entry.Path);
+        }
+
+        public string LoadUtf8(FileEntry entry)
+        {
+            return LoadUtf8(entry.Path);
         }
 
         public void Delete(FileEntry entry)
@@ -95,6 +115,5 @@ namespace CMS.Editor
                 .Select(entry => entry.Path)
                 .ToArray();
         }
-
     }
 }

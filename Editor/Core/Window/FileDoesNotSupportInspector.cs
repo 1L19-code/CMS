@@ -1,5 +1,4 @@
-﻿using ilya.cms.Editor;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace CMS.Editor
 {
@@ -7,7 +6,7 @@ namespace CMS.Editor
     {
         public ReaderId ReaderId { get; } = ReaderId.FromString("FileDoesNotSupportInspector");
 
-        public VisualElement GetWindow(FileEntry entry)
+        public VisualElement GetWindow(FileEntry fileEntry)
         {
             var root = new VisualElement();
             root.Add(new Label("File does not support"));

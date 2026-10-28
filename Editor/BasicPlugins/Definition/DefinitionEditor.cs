@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using Cms.DefinitionPlugin.Common;
 using CMS.Editor.Drawers;
-using ilya.cms.Editor;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,6 +13,8 @@ namespace CMS.Editor
 {
     internal class DefinitionEditor : IInspectorWindow
     {
+        private const string StylePath = "Packages/com.ilya.cms/Editor/src/InspectorBasicStyle.uss";
+
         private readonly IFileManager _fileManager;
         private readonly DefinitionsNamesMap _definitionsNamesMap;
 
@@ -24,24 +26,26 @@ namespace CMS.Editor
 
         public ReaderId ReaderId => ReaderId.FromString("Definition");
 
-        public VisualElement GetWindow(FileEntry descriptor)
+        public VisualElement GetWindow(FileEntry fileEntry)
         {
+            var style = AssetDatabase.LoadAssetAtPath<StyleSheet>(StylePath);
             var root = new VisualElement();
-            root.style.flexBasis = 0f;
-            root.style.minHeight = 0f;
+            root.styleSheets.Add(style);
+            root.AddToClassList("InspectorRoot");
 
-            if (!File.Exists(descriptor.Path))
-                throw new FileNotFoundException("Definition file not found", descriptor.Path);
-
-            var file = _fileManager.Load(descriptor);
-            var json = Encoding.UTF8.GetString(file);
+            var json = _fileManager.LoadUtf8(fileEntry);
             var meta = JsonUtility.FromJson<DefinitionMeta>(json);
 
             if (meta == null)
-                throw new FileNotFoundException("Definition file not found", descriptor.Path);
-
+            {
+                throw new FileNotFoundException("Definition file not found", fileEntry.Path);
+            }
+            
             var field = new DropdownField
-                { name = "ChooseDefinition", choices = new List<string>(_definitionsNamesMap.GetFriendlyNames()), };
+            {
+                name = "ChooseDefinition",
+                choices = new List<string>(_definitionsNamesMap.GetFriendlyNames()),
+            };
 
             var drawer = new BasicObjectDrawer();
 
@@ -79,7 +83,7 @@ namespace CMS.Editor
                 var objJson = JsonUtility.ToJson(obj, true);
                 meta.Data = objJson;
                 json = JsonUtility.ToJson(meta, true);
-                _fileManager.Save(Encoding.UTF8.GetBytes(json), descriptor.Path);
+                _fileManager.Save(Encoding.UTF8.GetBytes(json), fileEntry.Path);
             })
             {
                 text = "Save",
@@ -92,12 +96,11 @@ namespace CMS.Editor
             var scrollView = new ScrollView(ScrollViewMode.Vertical)
             {
                 horizontalScrollerVisibility = ScrollerVisibility.Hidden,
-                verticalScrollerVisibility = ScrollerVisibility.Auto
+                verticalScrollerVisibility = ScrollerVisibility.Auto,
             };
-            scrollView.style.flexGrow = 1f;
-            scrollView.style.flexBasis = 0f;
-            scrollView.style.minHeight = 0f;
+            
             scrollView.Add(drawer);
+            root.Add(new Label("DefinitionType"));
             root.Add(field);
             root.Add(scrollView);
             root.Add(saveButton);

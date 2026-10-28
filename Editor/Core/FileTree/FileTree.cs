@@ -54,6 +54,7 @@ namespace CMS.Editor
 
         public event Action<FileEntry> FileOpenRequested;
         public event Action<FileMoveRequest> FileMoveRequested;
+        public event Action FileSelectionCanceled;
 
         public void Dispose()
         {
@@ -71,8 +72,6 @@ namespace CMS.Editor
             {
                 _treeView.ExpandItem(expandedId);
             }
-
-            _directoryIndexes.Clear();
         }
 
         private void Show()
@@ -89,13 +88,13 @@ namespace CMS.Editor
             _treeView.makeItem = () =>
             {
                 var root = new VisualElement();
-                root.AddToClassList("fileRow");
+                root.AddToClassList("TreeNode");
 
                 var image = new Image();
-                image.AddToClassList("icon");
+                image.AddToClassList("Icon");
 
                 var label = new Label();
-                label.AddToClassList("label");
+                label.AddToClassList("Label");
 
                 root.Add(image);
                 root.Add(label);
@@ -150,6 +149,22 @@ namespace CMS.Editor
                 FileMoveRequested?.Invoke(new FileMoveRequest(fileEntry, directoryEntry.Path));
             };
 
+            _treeView.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                var target = evt.target as VisualElement;
+
+                while (target != null && target is not TreeView)
+                {
+                    if(target.ClassListContains("TreeNode"))
+                        return;
+                    
+                    target = target.parent;
+                }
+
+                _treeView.ClearSelection();
+                FileSelectionCanceled?.Invoke();
+            });
+            
             CreateContextMenu(this, _treeView, _contextMenuRegistrator, Refresh);
 
             _treeView.AddToClassList("fileView");

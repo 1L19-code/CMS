@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using Cms.DefinitionPlugin.Common;
-using ilya.cms.Editor;
 using UnityEngine;
 
 namespace CMS.Editor

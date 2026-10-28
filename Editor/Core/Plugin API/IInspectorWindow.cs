@@ -1,12 +1,11 @@
-using CMS.Editor;
 using UnityEngine.UIElements;
 
-namespace ilya.cms.Editor
+namespace CMS.Editor
 {
     public interface IInspectorWindow
     {
         ReaderId ReaderId { get; }
 
-        VisualElement GetWindow(FileEntry entry);
+        VisualElement GetWindow(FileEntry fileEntry);
     }
 }

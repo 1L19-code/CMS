@@ -28,21 +28,21 @@ namespace CMS.Editor.Drawers
 
         private static DropdownField Draw(Type type)
         {
-            var childen = AppDomain.CurrentDomain.GetAssemblies()
+            var children = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a
                     .GetTypes()
                     .Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && !t.ContainsGenericParameters)
                 )
                 .ToArray();
 
-            if (!childen.Any())
+            if (!children.Any())
                 throw new Exception($"Type '{type.FullName}' is not assignable to any type");
 
             var list = new List<string>
             {
                 "None"
             };
-            list.AddRange(childen.Select(t => t.FullName).OrderBy(name => name));
+            list.AddRange(children.Select(t => t.FullName).OrderBy(name => name));
             
             var field = new DropdownField()
             {

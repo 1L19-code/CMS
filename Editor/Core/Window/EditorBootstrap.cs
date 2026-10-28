@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using UnityEditor;
-using ilya.cms.Editor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CMS.Editor
@@ -59,16 +59,18 @@ namespace CMS.Editor
             locator.Get<IRegistrator<ContextMenuAction>>()
                 .Register(new ContextMenuAction("Delete", entry =>
                 {
+                    if (entry.Path == Path.GetFullPath(CmsConstants.PreCompilePath))
+                    {
+                        Debug.LogWarning($"Cannot delete {CmsConstants.PreCompilePath} because it is the root directory");
+                        
+                        return;
+                    }
+                    
                     popupsWrapper.ShowPopup(PopupDefinition
                         .WithTitle("Delete?")
                         .WithButtons(
                             new ButtonDefinition("Delete", _ =>
                             {
-                                if (entry.Path == Path.GetFullPath(CmsConstants.PreCompilePath))
-                                {
-                                    return;
-                                }
-
                                 fileManager.Delete(entry);
                             })));
                 }));

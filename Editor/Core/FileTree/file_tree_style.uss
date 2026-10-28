@@ -1,8 +1,8 @@
-﻿.fileRow{
+﻿.TreeNode{
     flex-direction: row;
     align-items: center;
 }
-.icon{
+.Icon{
     width: 20px;
     height: 20px;
 }

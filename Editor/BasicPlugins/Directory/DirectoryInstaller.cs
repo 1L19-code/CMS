@@ -16,6 +16,7 @@ namespace CMS.Editor
                     }
                     
                     var popups = locator.Get<PopupsWrapper>();
+                    var fileManager = locator.Get<IFileManager>();
 
                     popups.ShowPopup
                     (
@@ -29,7 +30,7 @@ namespace CMS.Editor
                                 }
                                 
                                 var path = Path.Combine(directory, folderName);
-                                Directory.CreateDirectory(Path.GetFullPath(path));
+                                fileManager.CreateDirectory(path);
                             }))
                 );
             }));

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace CMS.Editor
+namespace CMS
 {
-    internal interface IRegistrationResolver
+    public interface IRegistrationResolver
     {
     }
     //Collections
-    internal interface IRegistrationResolver<out TInstance> : IRegistrationResolver
+    public interface IRegistrationResolver<out TInstance> : IRegistrationResolver
     {
         TInstance[] GetInstances();
     }
@@ -18,7 +18,7 @@ namespace CMS.Editor
         void Register(TInstance instance);
     }
 
-    internal class Registrator<TInstance> :　IRegistrator<TInstance>, IRegistrationResolver<TInstance>
+    public class Registrator<TInstance> : IRegistrator<TInstance>, IRegistrationResolver<TInstance>
     {
         private readonly HashSet<TInstance> _instances = new();
         
@@ -39,13 +39,13 @@ namespace CMS.Editor
         void Register(TKey key, TInstance instance);
     }
 
-    internal interface IRegistrationResolver<in TKey, out TInstance> : IRegistrationResolver
+    public interface IRegistrationResolver<in TKey, out TInstance> : IRegistrationResolver
     {
         TInstance GetInstanceOrDefault(TKey key);
         bool HasInstance(TKey key);
     }
 
-    internal class Registrator<TKey, TInstance> : IRegistrator<TKey, TInstance>, IRegistrationResolver<TKey, TInstance>
+    public class Registrator<TKey, TInstance> : IRegistrator<TKey, TInstance>, IRegistrationResolver<TKey, TInstance>
     {
         private readonly Dictionary<TKey, TInstance> _instances = new();
         private readonly TInstance _defaultInstance;

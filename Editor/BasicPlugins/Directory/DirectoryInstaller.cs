@@ -2,7 +2,7 @@
 
 namespace CMS.Editor
 {
-    public class DirectoryInstaller : ExtensionInstaller<ContextMenuAction>
+    public class DirectoryInstaller : EditorExtensionInstaller<ContextMenuAction>
     {
         public override void Install(Locator locator, IRegistrator<ContextMenuAction> registrator)
         {

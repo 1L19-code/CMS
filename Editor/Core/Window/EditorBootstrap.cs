@@ -22,7 +22,7 @@ namespace CMS.Editor
             ValidateRoot();
 
             var locator = new Locator();
-            ExtensionsBootstrapUtility.BindRegistratorsInLocator(locator);
+            ExtensionsBootstrap.BindRegistratorsInLocator(locator);
 
             var customMetadataRegistrator = locator.Get<IRegistrator<FileExtension>>();
             customMetadataRegistrator.Register(new FileExtension(CmsConstants.ContentIdFileExtension));

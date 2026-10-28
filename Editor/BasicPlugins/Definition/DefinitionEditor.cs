@@ -24,7 +24,7 @@ namespace CMS.Editor
             _definitionsNamesMap = definitionsNamesMap;
         }
 
-        public ReaderId ReaderId => ReaderId.FromString("Definition");
+        public ReaderId ReaderId => DefinitionConstants.ReaderId;
 
         public VisualElement GetWindow(FileEntry fileEntry)
         {

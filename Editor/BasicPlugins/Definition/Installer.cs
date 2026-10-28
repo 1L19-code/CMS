@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CMS.Editor
 {
-    internal class DefinitionEditorInstaller : ExtensionInstaller<FileExtension, IInspectorWindow>
+    internal class DefinitionEditorInstaller : EditorExtensionInstaller<FileExtension, IInspectorWindow>
     {
         public override void Install(Locator locator, IRegistrator<FileExtension, IInspectorWindow> registrator)
         {
@@ -15,7 +15,7 @@ namespace CMS.Editor
         }
     }
 
-    internal class DefinitionContextMenuInstaller : ExtensionInstaller<ContextMenuAction>
+    internal class DefinitionContextMenuInstaller : EditorExtensionInstaller<ContextMenuAction>
     {
         public override void Install(Locator locator, IRegistrator<ContextMenuAction> registrator)
         {
@@ -54,7 +54,7 @@ namespace CMS.Editor
         }
     }
     
-    internal class DefinitionIconInstaller : ExtensionInstaller<FileExtension, Icon>
+    internal class DefinitionIconInstaller : EditorExtensionInstaller<FileExtension, Icon>
     {
         public override void Install(Locator locator, IRegistrator<FileExtension, Icon> registrator)
         {

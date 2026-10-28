@@ -12,7 +12,7 @@ namespace CMS
         public async ValueTask IndexAsync()
         {
             var locator = new Locator();
-            var plugins = new Registrator<ReaderId, ICmsPlugin>(null);
+            var plugins = new Registrator<ReaderId, ICmsPlugin>(new DefaultCmsPlugin());
             locator.Register(plugins);
 
             var installers = ExtensionsBootstrapUtility.GetInstallers<RuntimeExtensionInstaller>();
@@ -35,12 +35,6 @@ namespace CMS
             }
 
             var reader = _index.GetReader(contentId);
-
-            if (!_plugins.HasInstance(reader))
-            {
-                throw new InvalidOperationException("Runtime plugin instance not found.");
-            }
-            
             var segment = _index.GetSegment(contentId);
 
             return _plugins.GetInstanceOrDefault(reader).Get<T>(segment);

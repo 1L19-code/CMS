@@ -69,14 +69,14 @@ namespace CMS.Editor
             Changed?.Invoke();
         }
 
-        public void CreateDirectory(string relativePath)
+        public void TryCreateDirectory(string relativePath)
         {
-            if (Directory.Exists(relativePath)) 
+            if (Directory.Exists(relativePath))
                 return;
 
             var path = Path.GetFullPath(relativePath);
             Directory.CreateDirectory(path);
-            
+
             Changed?.Invoke();
         }
 
@@ -98,6 +98,14 @@ namespace CMS.Editor
         public void Delete(FileEntry entry)
         {
             Delete(entry.Path);
+        }
+
+        public FileEntry[] Find(string searchPattern)
+        {
+            var fileEnumerable =
+                Directory.EnumerateFiles(CmsConstants.PreCompilePath, searchPattern, SearchOption.AllDirectories);
+            
+            return fileEnumerable.Select(path => new FileEntry(path, Directory.Exists(path))).ToArray();
         }
 
         private static string[] GetAllMetaFilesPaths(string filePath)

@@ -30,7 +30,7 @@ namespace CMS.Editor
                                 }
                                 
                                 var path = Path.Combine(directory, folderName);
-                                fileManager.CreateDirectory(path);
+                                fileManager.TryCreateDirectory(path);
                             }))
                 );
             }));

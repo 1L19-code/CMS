@@ -32,6 +32,13 @@ namespace CMS.Editor
         {
             return new PopupDefinition(Title, textField, Buttons);
         }
+
+        public static PopupDefinition CreateFilePopup(Action<string> onSave, string fileExtension = null)
+        {
+            return WithTitle("Create")
+                .WithButtons(new ButtonDefinition("Save", onSave))
+                .WithTextField(new TextFieldDefinition("File name", fileExtension));
+        }
     }
 
     public readonly struct TextFieldDefinition
@@ -113,7 +120,7 @@ namespace CMS.Editor
 
                     body.Add(button);
                 }
-                
+
                 body.Add(new Button(RemoveFromHierarchy)
                 {
                     text = "Close"

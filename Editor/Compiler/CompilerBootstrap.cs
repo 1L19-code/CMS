@@ -8,25 +8,19 @@ namespace CMS.Editor
 {
     public static class CompilerEditorCommand
     {
-        [MenuItem("Cms/Build CompositionRoot")]
+        [MenuItem("CMS/Compile")]
         public static void Build()
         {
-            CompilerBootstrap.Build();
+            var locator = EditorBootstrap.Initialize();
+            CompilerBootstrap.Build(locator);
+            AssetDatabase.Refresh();
         }
     }
 
-    public class CompilerBootstrap : IPreprocessBuildWithReport
+    public static class CompilerBootstrap
     {
-        public int callbackOrder => 0;
-
-        public void OnPreprocessBuild(BuildReport report)
+        public static void Build(Locator locator)
         {
-            Build();
-        }
-
-        public static void Build()
-        {
-            var locator = EditorBootstrap.InitializeServices();
             using var metadataPipeline = locator.Get<MetadataGenerationPipeline>();
 
             var unregisteredFileCompiler = new UnregisteredFileCompiler(

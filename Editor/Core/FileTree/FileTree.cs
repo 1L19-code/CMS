@@ -155,16 +155,16 @@ namespace CMS.Editor
 
                 while (target != null && target is not TreeView)
                 {
-                    if(target.ClassListContains("TreeNode"))
+                    if (target.ClassListContains("TreeNode"))
                         return;
-                    
+
                     target = target.parent;
                 }
 
                 _treeView.ClearSelection();
                 FileSelectionCanceled?.Invoke();
             });
-            
+
             CreateContextMenu(this, _treeView, _contextMenuRegistrator, Refresh);
 
             _treeView.AddToClassList("fileView");
@@ -234,9 +234,8 @@ namespace CMS.Editor
             }
         }
 
-        private static void CreateContextMenu
-        (VisualElement target, TreeView tree, IRegistrationResolver<ContextMenuAction> resolver,
-            Action refreshAction)
+        private static void CreateContextMenu(VisualElement target, TreeView tree,
+            IRegistrationResolver<ContextMenuAction> resolver, Action refreshAction)
         {
             var rootPath = Path.GetFullPath(CmsConstants.PreCompilePath);
 

@@ -1,5 +1,3 @@
-using CMS.Editor;
-
 namespace CMS
 {
     public static class DefinitionConstants

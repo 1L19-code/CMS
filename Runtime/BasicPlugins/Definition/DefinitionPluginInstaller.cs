@@ -1,5 +1,3 @@
-using CMS.Editor;
-
 namespace CMS
 {
     public sealed class DefinitionPluginInstaller : RuntimeExtensionInstaller<ReaderId, ICmsPlugin>

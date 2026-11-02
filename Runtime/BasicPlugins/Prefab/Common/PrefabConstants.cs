@@ -1,6 +1,4 @@
-﻿using CMS.Editor;
-
-namespace CMS
+﻿namespace CMS
 {
     public static class PrefabConstants
     {

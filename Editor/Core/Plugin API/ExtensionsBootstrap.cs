@@ -5,7 +5,7 @@
         public static void Build(Locator locator)
         {
             var registrators = locator.GetSubclassOf<IRegistrationResolver>();
-            var installers = ExtensionsBootstrapUtility.GetInstallers<EditorExtensionInstaller>();
+            var installers = ExtensionsBootstrapUtility.GetInstallers<ExtensionInstaller>();
 
             foreach (var registrator in registrators)
             foreach (var installer in installers)

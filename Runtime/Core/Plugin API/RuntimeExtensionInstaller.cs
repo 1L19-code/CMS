@@ -2,12 +2,12 @@ namespace CMS
 {
     public abstract class RuntimeExtensionInstaller
     {
-        public abstract bool TryInstall(Locator locator, IRegistrationResolver registrator);
+        internal abstract bool TryInstall(Locator locator, IRegistrationResolver registrator);
     }
 
     public abstract class RuntimeExtensionInstaller<TKey, TInstance> : RuntimeExtensionInstaller
     {
-        public override bool TryInstall(Locator locator, IRegistrationResolver registrator)
+        internal override bool TryInstall(Locator locator, IRegistrationResolver registrator)
         {
             if (registrator is not IRegistrator<TKey, TInstance> casted)
                 return false;
@@ -21,7 +21,7 @@ namespace CMS
 
     public abstract class RuntimeExtensionInstaller<TInstance> : RuntimeExtensionInstaller
     {
-        public override bool TryInstall(Locator locator, IRegistrationResolver registrator)
+        internal override bool TryInstall(Locator locator, IRegistrationResolver registrator)
         {
             if (registrator is not IRegistrator<TInstance> casted)
                 return false;

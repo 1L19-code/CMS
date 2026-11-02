@@ -1,6 +1,6 @@
 ﻿namespace CMS.Editor
 {
-    public abstract class EditorExtensionInstaller
+    public abstract class ExtensionInstaller
     {
         /// <summary>
         /// Use it to cast object registrator to generic IRegistrator
@@ -10,7 +10,7 @@
         internal abstract bool TryInstall(Locator locator, IRegistrationResolver registrator);
     }
 
-    public abstract class EditorExtensionInstaller<TKey, TInstance> : EditorExtensionInstaller
+    public abstract class EditorExtensionInstaller<TKey, TInstance> : ExtensionInstaller
     {
         internal override bool TryInstall(Locator locator, IRegistrationResolver registrator)
         {
@@ -24,7 +24,7 @@
         public abstract void Install(Locator locator, IRegistrator<TKey, TInstance> registrator);
     }
 
-    public abstract class EditorExtensionInstaller<TInstance> : EditorExtensionInstaller
+    public abstract class EditorExtensionInstaller<TInstance> : ExtensionInstaller
     {
         internal override bool TryInstall(Locator locator, IRegistrationResolver registrator)
         {

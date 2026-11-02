@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -8,6 +7,7 @@ namespace CMS
     public interface IRegistrationResolver
     {
     }
+    
     //Collections
     public interface IRegistrationResolver<out TInstance> : IRegistrationResolver
     {

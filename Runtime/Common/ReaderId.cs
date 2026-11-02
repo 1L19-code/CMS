@@ -1,4 +1,4 @@
-﻿namespace CMS.Editor
+﻿namespace CMS
 {
     public readonly struct ReaderId : System.IEquatable<ReaderId>
     {

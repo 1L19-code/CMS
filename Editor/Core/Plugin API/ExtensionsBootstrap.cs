@@ -31,6 +31,7 @@
             locator.Register(visibilityIgnoreFile);
             locator.Register(customCompiler);
             locator.Register(metadataGenerators);
+            locator.Register(new Registrator<StaticSourceIgnore>());
         }
     }
 }

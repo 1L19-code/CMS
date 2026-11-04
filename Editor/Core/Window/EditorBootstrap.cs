@@ -49,7 +49,9 @@ namespace CMS.Editor
                 locator.Get<IRegistrationResolver<IMetadataGenerator>>(),
                 locator.Get<IRegistrationResolver<FileExtension>>(),
                 customMetadataRegistrator,
-                locator.Get<IRootDirectoryChangeObserver>());
+                locator.Get<IRootDirectoryChangeObserver>(),
+                new StaticSourceService(contentIdService,
+                    locator.Get<IRegistrationResolver<StaticSourceIgnore>>()));
             locator.Register(metadataPipeline);
 
             locator.Register(new PopupsWrapper());

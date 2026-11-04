@@ -11,16 +11,18 @@ namespace CMS.Editor
         private readonly IRegistrator<FileExtension> _customMetadataRegistrator;
         private readonly IRootDirectoryChangeObserver _observer;
         private bool _isGenerating;
+        private readonly StaticSourceService _staticSource;
 
         public MetadataGenerationPipeline(IRegistrationResolver<IMetadataGenerator> generators,
             IRegistrationResolver<FileExtension> customMetadataResolver,
             IRegistrator<FileExtension> customMetadataRegistrator,
-            IRootDirectoryChangeObserver observer)
+            IRootDirectoryChangeObserver observer, StaticSourceService staticSource)
         {
             _generators = generators;
             _customMetadataResolver = customMetadataResolver;
             _customMetadataRegistrator = customMetadataRegistrator;
             _observer = observer;
+            _staticSource = staticSource;
 
             Refresh();
             _observer.Changed += Refresh;
@@ -56,11 +58,13 @@ namespace CMS.Editor
 
                 var customMetadataExtensions = _customMetadataResolver.GetInstances().ToHashSet();
 
-                foreach (var entry in RawFileManager.GetAllEntries())
-                {
-                    if (entry.IsDirectory || customMetadataExtensions.Contains(FileExtension.FromPath(entry.Path)))
-                        continue;
+                var contentEntries = RawFileManager.GetAllEntries()
+                    .Where(entry => !entry.IsDirectory &&
+                        !customMetadataExtensions.Contains(FileExtension.FromPath(entry.Path)))
+                    .ToArray();
 
+                foreach (var entry in contentEntries)
+                {
                     foreach (var generator in generators)
                     {
                         var existingData =
@@ -74,6 +78,8 @@ namespace CMS.Editor
                             MetadataFileUtility.GetPath(entry.Path, generator.MetadataExtension));
                     }
                 }
+
+                _staticSource.Build(contentEntries);
             }
             finally
             {

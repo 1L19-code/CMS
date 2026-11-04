@@ -2,7 +2,10 @@
 
 `MetadataGenerationPipeline` generates `Assets/_Generated/Content.cs` after metadata
 generation, on initialization and each `IRootDirectoryChangeObserver.Changed` event.
-Access IDs through `CMS.Generated.CmsData.FILE_NAME`. Unchanged source is not rewritten.
+Access IDs through `CMS.Generated.CmsData.FILE_NAME`. The file is rewritten only when
+field names or content IDs change, including removals and exclusions. Comparison
+ignores field order, formatting, and comments; generated fields are sorted by name.
+Missing or malformed generated files are regenerated.
 
 Register exclusions through an editor extension installer:
 
@@ -24,5 +27,7 @@ public sealed class StaticSourceExclusions : EditorExtensionInstaller<StaticSour
 ```
 
 Exclusions affect only the generated source. Metadata and content compilation still run.
+Names are split into words at spaces and camelCase boundaries (`playerHealth` and
+`Player Health` become `PLAYER_HEALTH`, `HTTPServer` becomes `HTTP_SERVER`).
 Names are uppercased, unsupported characters become underscores, and leading digits
 are prefixed with an underscore. Name collisions receive a content ID suffix.

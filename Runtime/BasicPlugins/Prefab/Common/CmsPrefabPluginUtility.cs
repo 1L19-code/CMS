@@ -9,7 +9,7 @@ namespace CMS
     {
         public static bool TruGetGuid(Object obj, out string guid)
         {
-            return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out guid, out _);
+            return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(obj, out guid, out long _);
         }
 
         public static string CreateAsset(GameObject obj)

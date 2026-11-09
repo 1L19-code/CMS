@@ -101,7 +101,7 @@ namespace CMS.Editor
                 actual.SequenceEqual(expected);
         }
 
-        private static string GetIdentifier(string name)
+        internal static string GetIdentifier(string name)
         {
             name = Regex.Replace(name, @"([A-Z])([A-Z][a-z])", "$1_$2");
             name = Regex.Replace(name, @"([a-z0-9])([A-Z])", "$1_$2");

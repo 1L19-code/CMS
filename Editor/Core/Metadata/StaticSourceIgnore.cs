@@ -18,6 +18,11 @@ namespace CMS.Editor
             return new StaticSourceIgnore((entry, candidate) => candidate.Equals(id));
         }
 
+        public static StaticSourceIgnore ForPredicate(Func<FileEntry, ContentId, bool> matches)
+        {
+            return new StaticSourceIgnore(matches ?? throw new ArgumentNullException(nameof(matches)));
+        }
+
         /// <param name="path">Absolute path, or path relative to CmsConstants.PreCompilePath.</param>
         public static StaticSourceIgnore ForPath(string path)
         {

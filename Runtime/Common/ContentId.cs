@@ -44,6 +44,11 @@ namespace CMS
             return Id.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
+
         public static IEqualityComparer<ContentId> IdComparer { get; } = new ContentIdEqualityComparer();
     }
 

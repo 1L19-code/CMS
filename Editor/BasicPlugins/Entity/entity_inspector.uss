@@ -1,0 +1,85 @@
+.entity-inspector {
+    padding: 12px;
+    flex-grow: 1;
+}
+
+.entity-inspector__title {
+    font-size: 18px;
+    -unity-font-style: bold;
+    margin-bottom: 12px;
+}
+
+.entity-inspector__attachments {
+    margin-bottom: 8px;
+}
+
+.entity-inspector__attachment {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 6px;
+    margin-bottom: 4px;
+    background-color: rgba(128, 128, 128, 0.12);
+    border-radius: 4px;
+}
+
+.entity-inspector__file {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    white-space: normal;
+    margin-right: 8px;
+}
+
+.entity-inspector__detach,
+.entity-inspector__open,
+.entity-inspector__replace {
+    flex-shrink: 0;
+    min-width: 64px;
+    height: 24px;
+}
+
+.entity-inspector__section-title {
+    -unity-font-style: bold;
+    margin-top: 8px;
+    margin-bottom: 6px;
+}
+
+.entity-inspector__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.entity-inspector__slot {
+    flex-grow: 1;
+    min-width: 180px;
+    margin-right: 8px;
+}
+
+.entity-inspector__slot > .unity-base-field__label {
+    min-width: 40px;
+}
+
+.entity-inspector__key {
+    min-width: 160px;
+    flex-grow: 1;
+    margin-right: 8px;
+}
+
+.entity-inspector__key > .unity-base-field__label {
+    min-width: 40px;
+}
+
+.entity-inspector__attach {
+    min-width: 80px;
+    height: 26px;
+}
+
+.entity-inspector__save {
+    align-self: flex-end;
+    min-width: 100px;
+    height: 28px;
+    -unity-font-style: bold;
+}

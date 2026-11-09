@@ -32,6 +32,7 @@ namespace CMS.Editor
                 locator.Get<IRegistrationResolver<FileExtension, IInspectorWindow>>(),
                 _fileTree
             );
+            locator.Register(_inspector);
 
             var splitView = new TwoPaneSplitView
             (

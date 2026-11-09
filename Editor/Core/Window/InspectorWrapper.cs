@@ -14,7 +14,7 @@ namespace CMS.Editor
         {
             _windowResolver = windowResolver;
             _fileTree = fileTree;
-            _fileTree.FileOpenRequested += OnFileOpenRequested;
+            _fileTree.FileOpenRequested += OpenFile;
             _fileTree.FileSelectionCanceled += OnFileSelectionCanceled;
             
             style.height = new StyleLength(Length.Percent(100));
@@ -23,11 +23,14 @@ namespace CMS.Editor
 
         public void Dispose()
         {
-            _fileTree.FileOpenRequested -= OnFileOpenRequested;
+            _fileTree.FileOpenRequested -= OpenFile;
             _fileTree.FileSelectionCanceled -= OnFileSelectionCanceled;
         }
 
-        private void OnFileOpenRequested(FileEntry entry)
+        /// <summary>
+        /// Opens a file's inspector without requiring a file-tree selection, including hidden attachments.
+        /// </summary>
+        public void OpenFile(FileEntry entry)
         {
             var extension = new FileExtension(Path.GetExtension(entry.Path));
             var inspector = _windowResolver.GetInstanceOrDefault(extension);

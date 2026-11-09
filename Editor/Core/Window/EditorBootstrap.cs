@@ -97,7 +97,9 @@ namespace CMS.Editor
             var customMetadataResolver = locator.Get<IRegistrationResolver<FileExtension>>();
             var observer = locator.Get<IRootDirectoryChangeObserver>();
 
-            var fileTree = new FileTree(iconResolver, contextMenuResolver, customMetadataResolver, observer);
+            var fileTree = new FileTree(iconResolver, contextMenuResolver, customMetadataResolver, observer,
+                locator.Get<IRegistrationResolver<FileEntry>>(),
+                locator.Get<IRegistrationResolver<FileTreeIgnore>>());
             var style = AssetDatabase.LoadAssetAtPath<StyleSheet>(
                 "Packages/com.ilya.cms/Editor/Core/FileTree/file_tree_style.uss");
             fileTree.styleSheets.Add(style);

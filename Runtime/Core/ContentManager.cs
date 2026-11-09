@@ -11,6 +11,7 @@ namespace CMS
         public async ValueTask IndexAsync()
         {
             var locator = new Locator();
+            locator.Register(this);
             var plugins = new Registrator<ReaderId, ICmsPlugin>(new DefaultCmsPlugin());
             locator.Register(plugins);
 

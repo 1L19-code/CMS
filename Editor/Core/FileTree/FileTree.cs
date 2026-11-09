@@ -33,6 +33,8 @@ namespace CMS.Editor
         private readonly IRegistrationResolver<ContextMenuAction> _contextMenuRegistrator;
         private readonly IRegistrationResolver<FileExtension> _customMetadataResolver;
         private readonly IRootDirectoryChangeObserver _changeObserver;
+        private readonly IRegistrationResolver<FileEntry> _hiddenFiles;
+        private readonly IRegistrationResolver<FileTreeIgnore> _visibilityRules;
         private readonly HashSet<int> _directoryIndexes = new();
 
         private TreeView _treeView;
@@ -40,12 +42,16 @@ namespace CMS.Editor
         public FileTree(IRegistrationResolver<FileExtension, Icon> iconRegistrator,
             IRegistrationResolver<ContextMenuAction> contextMenuRegistrator,
             IRegistrationResolver<FileExtension> customMetadataResolver,
-            IRootDirectoryChangeObserver changeObserver)
+            IRootDirectoryChangeObserver changeObserver,
+            IRegistrationResolver<FileEntry> hiddenFiles,
+            IRegistrationResolver<FileTreeIgnore> visibilityRules)
         {
             _iconRegistrator = iconRegistrator;
             _contextMenuRegistrator = contextMenuRegistrator;
             _changeObserver = changeObserver;
             _customMetadataResolver = customMetadataResolver;
+            _hiddenFiles = hiddenFiles;
+            _visibilityRules = visibilityRules;
 
             _changeObserver.Changed += Refresh;
 
@@ -64,6 +70,7 @@ namespace CMS.Editor
         public void Refresh()
         {
             var expandedIds = GetExpandedIds(_treeView, _directoryIndexes.ToArray());
+            _directoryIndexes.Clear();
             _treeView.SetRootItems(GenerateData(RawFileManager.GetAllEntries(),
                 _customMetadataResolver.GetInstances()));
             _treeView.Rebuild();
@@ -171,12 +178,19 @@ namespace CMS.Editor
             Add(_treeView);
         }
 
-        private static IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries,
+        private IList<TreeViewItemData<FileEntry>> GenerateData(FileEntry[] entries,
             FileExtension[] customMetadataExtensions)
         {
             var customMetadataExtensionsHash = customMetadataExtensions.ToHashSet();
+            var hiddenPaths = _hiddenFiles.GetInstances()
+                .Select(entry => Path.GetFullPath(entry.Path))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var visibilityRules = _visibilityRules.GetInstances();
+
             var paths = entries
                 .Where(entry => !customMetadataExtensionsHash.Contains(FileExtension.FromPath(entry.Path)))
+                .Where(entry => !hiddenPaths.Contains(Path.GetFullPath(entry.Path)) &&
+                    !visibilityRules.Any(rule => rule.Matches(entry)))
                 .ToDictionary
                 (
                     e => e.Path,

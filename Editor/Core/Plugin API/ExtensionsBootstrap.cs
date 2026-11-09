@@ -29,6 +29,7 @@
             locator.Register(contextMenu);
             locator.Register(customMetadataRegistrator);
             locator.Register(visibilityIgnoreFile);
+            locator.Register(new Registrator<FileTreeIgnore>());
             locator.Register(customCompiler);
             locator.Register(metadataGenerators);
             locator.Register(new Registrator<StaticSourceIgnore>());

@@ -10,7 +10,6 @@ namespace CMS.Editor
         private readonly IRegistrationResolver<FileExtension> _customMetadataResolver;
         private readonly IRegistrator<FileExtension> _customMetadataRegistrator;
         private readonly IRootDirectoryChangeObserver _observer;
-        private bool _isGenerating;
         private readonly StaticSourceService _staticSource;
 
         public MetadataGenerationPipeline(IRegistrationResolver<IMetadataGenerator> generators,
@@ -30,61 +29,47 @@ namespace CMS.Editor
 
         public void Refresh()
         {
-            if (_isGenerating)
+            var generators = _generators.GetInstances().OrderBy(generator => generator.Order).ToArray();
+            var generatedExtensions = new HashSet<FileExtension>();
+
+            foreach (var generator in generators)
             {
-                return;
+                var extension = generator.MetadataExtension;
+
+                if (string.IsNullOrEmpty(extension.Value))
+                    throw new InvalidOperationException("Metadata generator must declare a file extension");
+
+                if (!generatedExtensions.Add(extension))
+                    throw new InvalidOperationException(
+                        $"Multiple metadata generators registered for '{extension}'");
+
+                _customMetadataRegistrator.Register(extension);
             }
 
-            _isGenerating = true;
+            var customMetadataExtensions = _customMetadataResolver.GetInstances().ToHashSet();
 
-            try
+            var contentEntries = RawFileManager.GetAllEntries()
+                .Where(entry => !entry.IsDirectory &&
+                                !customMetadataExtensions.Contains(FileExtension.FromPath(entry.Path)))
+                .ToArray();
+
+            foreach (var entry in contentEntries)
             {
-                var generators = _generators.GetInstances().OrderBy(generator => generator.Order).ToArray();
-                var generatedExtensions = new HashSet<FileExtension>();
-
                 foreach (var generator in generators)
                 {
-                    var extension = generator.MetadataExtension;
+                    var existingData =
+                        MetadataFileUtility.LoadOrDefault(entry.Path, generator.MetadataExtension);
+                    var data = generator.Generate(entry, existingData?.ToArray());
 
-                    if (string.IsNullOrEmpty(extension.Value))
-                        throw new InvalidOperationException("Metadata generator must declare a file extension");
+                    if (data == null || existingData != null && data.SequenceEqual(existingData))
+                        continue;
 
-                    if (!generatedExtensions.Add(extension))
-                        throw new InvalidOperationException(
-                            $"Multiple metadata generators registered for '{extension}'");
-
-                    _customMetadataRegistrator.Register(extension);
+                    RawFileManager.Save(data,
+                        MetadataFileUtility.GetPath(entry.Path, generator.MetadataExtension));
                 }
-
-                var customMetadataExtensions = _customMetadataResolver.GetInstances().ToHashSet();
-
-                var contentEntries = RawFileManager.GetAllEntries()
-                    .Where(entry => !entry.IsDirectory &&
-                        !customMetadataExtensions.Contains(FileExtension.FromPath(entry.Path)))
-                    .ToArray();
-
-                foreach (var entry in contentEntries)
-                {
-                    foreach (var generator in generators)
-                    {
-                        var existingData =
-                            MetadataFileUtility.LoadOrDefault(entry.Path, generator.MetadataExtension);
-                        var data = generator.Generate(entry, existingData?.ToArray());
-
-                        if (data == null || existingData != null && data.SequenceEqual(existingData))
-                            continue;
-
-                        RawFileManager.Save(data,
-                            MetadataFileUtility.GetPath(entry.Path, generator.MetadataExtension));
-                    }
-                }
-
-                _staticSource.Build(contentEntries);
             }
-            finally
-            {
-                _isGenerating = false;
-            }
+
+            _staticSource.Build(contentEntries);
         }
 
         public void Dispose()

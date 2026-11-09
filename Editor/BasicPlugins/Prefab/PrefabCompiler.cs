@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,7 +47,10 @@ namespace CMS.Editor
                 if (!Guid.TryParse(guid, out var assetGuid) || assetGuid == Guid.Empty)
                     throw new InvalidDataException($"Invalid prefab GUID in '{entry.Path}'.");
 
-                var prefab = AssetDatabase.LoadAssetByGUID<Object>(new GUID(assetGuid.ToString("N")));
+                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid.ToString("N"));
+                var prefab = string.IsNullOrEmpty(assetPath)
+                    ? null
+                    : AssetDatabase.LoadAssetAtPath<Object>(assetPath);
 
                 if (prefab == null)
                     throw new InvalidDataException($"Prefab '{guid}' referenced by '{entry.Path}' was not found.");

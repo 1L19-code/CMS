@@ -1,4 +1,5 @@
-﻿using System.IO;
+#if UNITY_EDITOR
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,9 +43,11 @@ namespace CMS
 
         public static bool TryGetAsset(string guid, out Object obj)
         {
-            obj = AssetDatabase.LoadAssetByGUID<Object>(new GUID(guid));
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            obj = string.IsNullOrEmpty(path) ? null : AssetDatabase.LoadAssetAtPath<Object>(path);
 
             return obj != null;
         }
     }
 }
+#endif

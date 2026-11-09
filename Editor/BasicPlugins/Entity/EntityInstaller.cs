@@ -44,6 +44,14 @@ namespace CMS.Editor
         }
     }
     
+    internal class EntityIconInstaller : EditorExtensionInstaller<FileExtension, Icon>
+    {
+        public override void Install(Locator locator, IRegistrator<FileExtension, Icon> registrator)
+        {
+            registrator.Register(new FileExtension(EntityConstants.FileExtension), new Icon("GameObject Icon"));
+        }
+    }
+
     internal class EntityInspectorInstaller : EditorExtensionInstaller<FileExtension, IInspectorWindow>
     {
         public override void Install(Locator locator, IRegistrator<FileExtension, IInspectorWindow> registrator)
